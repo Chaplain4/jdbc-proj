@@ -1,6 +1,7 @@
 package dao;
 
 import model.Employee;
+import model.Office;
 
 import java.util.Set;
 
@@ -11,5 +12,5 @@ public interface EmployeeDAO {
     boolean updateEmployee(Employee employee);
     Set<Employee> all();
     // и так далее
-    Set<Employee> getAllByOfficeID(int officeID);
+    Set<Employee> getAllByOfficeID(Office office);
 }

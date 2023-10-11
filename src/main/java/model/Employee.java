@@ -10,8 +10,8 @@ public class Employee {
     private String name;
     private String lastName;
     private int age;
-    private int officeId;
-    private String passportId;
+    private Office office;
+    private Passport passport;
     private Timestamp updatedTs;
     private Timestamp createdTs;
 }
