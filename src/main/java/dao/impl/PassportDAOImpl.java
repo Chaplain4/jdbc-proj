@@ -15,7 +15,17 @@ import java.util.Set;
 public class PassportDAOImpl implements PassportDAO {
     @Override
     public boolean createPassport(Passport passport) {
-        return false;
+        Connection connection = DBUtils.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String sql = "INSERT INTO `passport` (`id`, `personal_id`, `ind_id`, `exp_ts`, `created_ts`) VALUES " +
+                    "(NULL, " + passport.getPersonalID() + ", "+  passport.getIndID()  +" , " + passport.getExpTS() +
+                    ", " + passport.getCreatedTS() +")";
+            int count = statement.executeUpdate(sql);
+            return count == 1;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -41,12 +51,33 @@ public class PassportDAOImpl implements PassportDAO {
 
     @Override
     public boolean deleteById(int id) {
-        return false;
+        Connection connection = DBUtils.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute("DELETE FROM passport where id =" + id);
+            if (findById(id) == null) {
+                return true;
+            }
+            else return false;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public boolean updatePassport(Passport passport) {
-        return false;
+        Connection connection = DBUtils.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute("UPDATE passport SET personal_id = '" + passport.getPersonalID() + "', ind_id = '" + passport.getIndID() + "', exp_ts = " +
+                    "'" + passport.getExpTS() + "', created_ts = '" + passport.getCreatedTS() + "'  WHERE id = " + passport.getId());
+            if (findById(passport.getId()).equals(passport)) {
+                return true;
+            }
+            else return false;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -69,6 +100,5 @@ public class PassportDAOImpl implements PassportDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 }

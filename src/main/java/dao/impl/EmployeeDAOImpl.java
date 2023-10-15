@@ -21,7 +21,18 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 
     @Override
     public boolean createEmployee(Employee employee) {
-        return false;
+        Connection connection = DBUtils.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String sql = "INSERT INTO `employees` (`id`, `name`, `last_name`, `age`, `office_id`, `passport_id`, " +
+                    "`updated_ts`, `created_ts`) VALUES ('" + employee.getId() + "', '" + employee.getName() + "', '" +
+                    employee.getLastName() + "', '" + employee.getAge() + "', '" + employee.getOffice().getId() + "', '" +
+                    employee.getPassport().getId() + "', '" + employee.getUpdatedTs() + "', " + employee.getCreatedTs() + ")";
+            int count = statement.executeUpdate(sql);
+            return count == 1;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -41,12 +52,34 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 
     @Override
     public boolean deleteById(int id) {
-        return false;
+        Connection connection = DBUtils.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute("DELETE FROM employees where id =" + id);
+            if (findById(id) == null) {
+                return true;
+            }
+            else return false;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public boolean updateEmployee(Employee employee) {
-        return false;
+        Connection connection = DBUtils.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute("UPDATE employees SET name = '"+employee.getName()+"', last_name = '" + employee.getLastName() +
+                    "', age = '" + employee.getAge() + "', office_id = '" + employee.getOffice().getId() + "', passport_id = '" +
+                    employee.getPassport().getId() + "' WHERE id = " + employee.getId());
+            if (findById(employee.getId()).equals(employee)) {
+                return true;
+            }
+            else return false;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -71,7 +104,22 @@ public class EmployeeDAOImpl implements EmployeeDAO {
 
     @Override
     public Set<Employee> getAllByOfficeID(Office office) {
-        return null;
+        Set<Employee> employees = new HashSet<>();
+        Connection connection = DBUtils.getConnection();
+        Statement statement = null;
+        ResultSet rs = null;
+        try {
+            statement = connection.createStatement();
+            rs = statement.executeQuery("SELECT * FROM employees WHERE office_id = " + office.getId());
+            while (rs.next()) {
+                employees.add(createEmployee(rs));
+            }
+            return employees;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DBUtils.release(connection, statement, rs);
+        }
     }
 
     private Employee createEmployee(ResultSet rs) throws SQLException {

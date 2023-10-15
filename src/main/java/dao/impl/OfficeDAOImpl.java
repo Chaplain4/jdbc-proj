@@ -54,12 +54,32 @@ public class OfficeDAOImpl implements OfficeDAO {
 
     @Override
     public boolean deleteById(int id) {
-        return false;
+        Connection connection = DBUtils.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute("DELETE FROM offices where id =" + id);
+            if (findById(id) == null) {
+                return true;
+            } else return false;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public boolean updateOffice(Office office) {
-        return false;
+        Connection connection = DBUtils.getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute("UPDATE offices SET title = '" + office.getTitle() + "', address = '" + office.getAddress() +
+                    "', `phone 1` = '" + office.getPhone1() + "', `phone 2` = '" + office.getPhone2() + "', postal_code = '" + office.getPostalCode() +
+                    "', updated_ts = '" + office.getUpdatedTS() + "' WHERE id = " + office.getId());
+            if (findById(office.getId()).equals(office)) {
+                return true;
+            } else return false;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -85,6 +105,5 @@ public class OfficeDAOImpl implements OfficeDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 }
